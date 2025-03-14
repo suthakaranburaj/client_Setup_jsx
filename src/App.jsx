@@ -27,6 +27,12 @@ import SearchIcon from "@mui/icons-material/Search";
 import { MailIcon } from "lucide-react";
 import TextField from "@mui/material/TextField";
 import Badge from "@mui/material/Badge";
+import { asyncHandler, getCookie } from "./helper/commonHelper";
+import {
+  login_service,
+  logout_service,
+  get_current_user_service
+} from "./services/authServices/authServices";
 
 import {
   Account,
@@ -34,6 +40,8 @@ import {
   AccountPopoverFooter,
   SignOutButton
 } from "@toolpad/core/Account";
+import * as Pages from "./layout/index.js";
+import { Outlet } from "react-router-dom";
 
 const NAVIGATION = [
   {
@@ -145,33 +153,33 @@ AccountSidebarPreview.propTypes = {
 };
 
 const accounts = [
-  {
-    id: 1,
-    name: "Bharat Kashyap",
-    email: "bharatkashyap@outlook.com",
-    image: "https://avatars.githubusercontent.com/u/19550456",
-    projects: [
-      {
-        id: 3,
-        title: "Project X"
-      }
-    ]
-  },
-  {
-    id: 2,
-    name: "Bharat MUI",
-    email: "bharat@mui.com",
-    color: "#8B4513", // Brown color
-    projects: [{ id: 4, title: "Project A" }]
-  }
+  // {
+  //   id: 1,
+  //   name: "Bharat Kashyap",
+  //   email: "bharatkashyap@outlook.com",
+  //   image: "https://avatars.githubusercontent.com/u/19550456",
+  //   projects: [
+  //     {
+  //       id: 3,
+  //       title: "Project X"
+  //     }
+  //   ]
+  // },
+  // {
+  //   id: 2,
+  //   name: "Bharat MUI",
+  //   email: "bharat@mui.com",
+  //   color: "#8B4513", // Brown color
+  //   projects: [{ id: 4, title: "Project A" }]
+  // }
 ];
 
 function SidebarFooterAccountPopover() {
   return (
     <Stack direction="column">
-      <Typography variant="body2" mx={2} mt={1}>
+      {/* <Typography variant="body2" mx={2} mt={1}>
         Accounts
-      </Typography>
+      </Typography> */}
       <MenuList>
         {accounts.map((account) => (
           <MenuItem
@@ -191,7 +199,7 @@ function SidebarFooterAccountPopover() {
                   fontSize: "0.95rem",
                   bgcolor: account.color
                 }}
-                src={account.image ?? ""}
+                src={account?.image ?? ""}
                 alt={account.name ?? ""}
               >
                 {account.name[0]}
@@ -379,7 +387,42 @@ function DashboardLayoutAccountSidebar(props) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
-  const [session, setSession] = React.useState(demoSession);
+  const [session, setSession] = React.useState(null);
+  const [authView, setAuthView] = React.useState(null);
+  React.useEffect(() => {
+    // console.log('hee2')
+    const checkUser = async () => {
+      // console.log('hell1')
+      await handle_get_user();
+    };
+    checkUser();
+  }, [authView]);
+
+  const handle_get_user = async () => {
+    const accessToken = getCookie("accessToken");
+    const refreshToken = getCookie("refreshToken");
+    // console.log(accessToken,"ffff",refreshToken)
+    // Only proceed if both tokens exist
+    // console.log("hee");
+    if (!accessToken || !refreshToken) {
+      setSession(null);
+      return;
+    }
+
+    try {
+      const response = await get_current_user_service();
+      if (response.data.data) {
+        // console.log('heelo')
+        setSession({
+          user: response.data.data
+        });
+      }
+      console.log("response", response.data.data);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      setSession(null);
+    }
+  };
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
@@ -397,8 +440,22 @@ function DashboardLayoutAccountSidebar(props) {
       router={router}
       theme={demoTheme}
       window={demoWindow}
-      authentication={authentication}
-      session={session}
+      authentication={{
+        signIn: () => setAuthView("login"), // Refresh user data on sign-in
+        signOut: async () => {
+          await logout_service();
+          setSession(null);
+        }
+      }}
+      session={session?.user ? session : null}
+      // slots={{
+      //   login: () => (
+      //     <Pages.Login
+      //       onSwitchToRegister={() => setAuthView("register")}
+      //       onClose={() => setAuthView(null)}
+      //     />
+      //   )
+      // }}
     >
       <DashboardLayout
         slots={{
@@ -408,7 +465,26 @@ function DashboardLayoutAccountSidebar(props) {
         }}
       >
         <DemoPageContent pathname={pathname} />
+        <Outlet />
       </DashboardLayout>
+      {authView === "login" && (
+        <Pages.Login
+          onSwitchToRegister={() => setAuthView("register")}
+          onClose={() => {
+            setAuthView(null);
+            handle_get_user();
+          }}
+        />
+      )}
+      {authView === "register" && (
+        <Pages.Register
+          onSwitchToLogin={() => setAuthView("login")}
+          onClose={() => {
+            setAuthView(null);
+            handle_get_user();
+          }}
+        />
+      )}
     </AppProvider>
   );
 }
