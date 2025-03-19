@@ -16,6 +16,7 @@
     "@mui/material": "^6.4.7",
     "@toolpad/core": "^0.13.0",
     "axios": "^1.8.3",
+    "client": "file:",
     "clsx": "^2.1.1",
     "lucide-react": "^0.479.0",
     "motion": "^12.5.0",

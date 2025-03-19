@@ -27,6 +27,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import { MailIcon } from "lucide-react";
 import TextField from "@mui/material/TextField";
 import Badge from "@mui/material/Badge";
+import List from "@mui/material/List";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Button from "@mui/material/Button";
+import SendIcon from "@mui/icons-material/Send";
 import { asyncHandler, getCookie } from "./helper/commonHelper";
 import {
   login_service,
@@ -105,17 +109,130 @@ const demoTheme = createTheme({
   }
 });
 
-function DemoPageContent({ pathname }) {
+function ChatInterface() {
+  const [messages, setMessages] = React.useState([]);
+  const [input, setInput] = React.useState('');
+  const [error, setError] = React.useState(null);
+
+  const handleSend = async () => {
+    if (!input.trim()) return;
+
+    // Add user message
+    const newMessage = { text: input, isBot: false };
+    setMessages(prev => [...prev, newMessage]);
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/finance-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: input })
+      });
+
+      if (!response.ok) throw new Error('API request failed');
+      
+      const data = await response.json();
+      
+      // Add bot response
+      setMessages(prev => [...prev, { 
+        text: data.bot_response || data.error, 
+        isBot: true 
+      }]);
+      
+    } catch (err) {
+      setError(err.message);
+      setMessages(prev => [...prev, { 
+        text: 'Error communicating with the assistant', 
+        isBot: true 
+      }]);
+    }
+    
+    setInput('');
+  };
+
   return (
-    <Box
-      sx={{
-        py: 4,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        textAlign: "center"
-      }}
-    >
+    <Box sx={{ 
+      height: 'calc(100vh - 128px)',
+      display: 'flex',
+      flexDirection: 'column',
+      p: 2
+    }}>
+      <List sx={{ 
+        flexGrow: 1,
+        overflow: 'auto',
+        mb: 2,
+        '& .MuiListItem-root': {
+          alignItems: 'flex-start'
+        }
+      }}>
+        {messages.map((msg, index) => (
+          <ListItem key={index}>
+            <ListItemAvatar>
+              <Avatar sx={{ 
+                bgcolor: msg.isBot ? 'primary.main' : 'secondary.main'
+              }}>
+                {msg.isBot ? '🤖' : '👤'}
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText
+              primary={msg.text}
+              sx={{
+                bgcolor: msg.isBot ? 'action.selected' : 'background.paper',
+                p: 2,
+                borderRadius: 2
+              }}
+            />
+          </ListItem>
+        ))}
+      </List>
+
+      <Box sx={{ 
+        display: 'flex',
+        gap: 2,
+        alignItems: 'center',
+        p: 2,
+        borderTop: '1px solid',
+        borderColor: 'divider'
+      }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+          placeholder="Ask financial questions..."
+        />
+        <Button
+          variant="contained"
+          endIcon={<SendIcon />}
+          onClick={handleSend}
+          disabled={!input.trim()}
+        >
+          Send
+        </Button>
+      </Box>
+
+      {error && (
+        <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+          Error: {error}
+        </Typography>
+      )}
+    </Box>
+  );
+}
+
+function DemoPageContent({ pathname }) {
+  if (pathname === '/chatbot') {
+    return <ChatInterface />;
+  }
+
+  return (
+    <Box sx={{
+      py: 4,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      textAlign: 'center'
+    }}>
       <Typography>Dashboard content for {pathname}</Typography>
     </Box>
   );
