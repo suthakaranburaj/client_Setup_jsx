@@ -1,32 +1,24 @@
 import * as React from "react";
 import PropTypes from "prop-types";
-import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
-import MenuList from "@mui/material/MenuList";
 import MenuItem from "@mui/material/MenuItem";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
 import { createTheme } from "@mui/material/styles";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloudCircleIcon from "@mui/icons-material/CloudCircle";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { AppProvider } from "@toolpad/core/AppProvider";
 import { DashboardLayout, ThemeSwitcher } from "@toolpad/core/DashboardLayout";
 import Chip from "@mui/material/Chip";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
-import SmartToyIcon from "@mui/icons-material/SmartToy";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import DescriptionIcon from "@mui/icons-material/Description";
 import LayersIcon from "@mui/icons-material/Layers";
 import SearchIcon from "@mui/icons-material/Search";
-import { MailIcon } from "lucide-react";
 import TextField from "@mui/material/TextField";
-import Badge from "@mui/material/Badge";
 import { asyncHandler, getCookie } from "../../../helper/commonHelper.js";
 import {
   login_service,
@@ -43,7 +35,7 @@ import {
 import * as Pages from "../../index.js";
 import { Outlet } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
-import Button from "@mui/material/Button";
+import NotificationBar from "./Components/NotificationBar.jsx";
 
 const NAVIGATION = [
   {
@@ -124,26 +116,6 @@ const demoTheme = createTheme({
   }
 });
 
-function DemoPageContent({ pathname }) {
-  return (
-    <Box
-      sx={{
-        py: 4,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        textAlign: "center"
-      }}
-    >
-      {/* <Typography>Dashboard content for {pathname}</Typography> */}
-    </Box>
-  );
-}
-
-DemoPageContent.propTypes = {
-  pathname: PropTypes.string.isRequired
-};
-
 function AccountSidebarPreview(props) {
   const { handleClick, open, mini } = props;
   return (
@@ -171,75 +143,9 @@ AccountSidebarPreview.propTypes = {
   open: PropTypes.bool
 };
 
-const accounts = [
-  // {
-  //   id: 1,
-  //   name: "Bharat Kashyap",
-  //   email: "bharatkashyap@outlook.com",
-  //   image: "https://avatars.githubusercontent.com/u/19550456",
-  //   projects: [
-  //     {
-  //       id: 3,
-  //       title: "Project X"
-  //     }
-  //   ]
-  // },
-  // {
-  //   id: 2,
-  //   name: "Bharat MUI",
-  //   email: "bharat@mui.com",
-  //   color: "#8B4513", // Brown color
-  //   projects: [{ id: 4, title: "Project A" }]
-  // }
-];
-
 function SidebarFooterAccountPopover() {
   return (
     <Stack direction="column">
-      {/* <Typography variant="body2" mx={2} mt={1}>
-        Accounts
-      </Typography> */}
-      {/* <MenuList>
-        {accounts.map((account) => (
-          <MenuItem
-            key={account.id}
-            component="button"
-            sx={{
-              justifyContent: "flex-start",
-              width: "100%",
-              columnGap: 2
-            }}
-          >
-            <ListItemIcon>
-              <Avatar
-                sx={{
-                  width: 32,
-                  height: 32,
-                  fontSize: "0.95rem",
-                  bgcolor: account.color
-                }}
-                src={account?.image ?? ""}
-                alt={account.name ?? ""}
-              >
-                {account.name[0]}
-              </Avatar>
-            </ListItemIcon>
-            <ListItemText
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                width: "100%"
-              }}
-              primary={account.name}
-              secondary={account.email}
-              primaryTypographyProps={{ variant: "body2" }}
-              secondaryTypographyProps={{ variant: "caption" }}
-            />
-          </MenuItem>
-        ))}
-      </MenuList>
-      <Divider /> */}
       <AccountPopoverFooter>
         <SignOutButton />
       </AccountPopoverFooter>
@@ -320,32 +226,6 @@ function CustomAppTitle() {
     </Stack>
   );
 }
-
-const NotificationBar = () => {
-  return (
-    <Stack spacing={2} direction="row" alignItems="center" sx={{ mr: 1 }}>
-      <Tooltip
-        title="Notifications"
-        PopperProps={{
-          modifiers: [
-            {
-              name: "offset",
-              options: {
-                offset: [0, 10] // [horizontal, vertical] offset
-              }
-            }
-          ]
-        }}
-      >
-        <Badge badgeContent={4} color="primary">
-          <Box sx={{ color: "text.primary" }}>
-            <MailIcon fontSize="small" />
-          </Box>
-        </Badge>
-      </Tooltip>
-    </Stack>
-  );
-};
 
 function ToolbarActionsSearch() {
   return (

@@ -1,10 +1,20 @@
 import React, { useState } from "react";
-import { TextField, Button, Container, Typography, Box, Link } from "@mui/material";
+import { TextField, Button, Container, Typography, Box, Link, Snackbar } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
 import { login_service } from "../../../services/authServices/authServices";
 
 const LoginPage = ({ onSwitchToRegister, onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState("info");
+
+  const showToast = (message, severity = "error") => {
+    setToastMessage(message);
+    setToastSeverity(severity);
+    setToastOpen(true);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -13,10 +23,16 @@ const LoginPage = ({ onSwitchToRegister, onClose }) => {
         email: email,
         password: password
       };
-      await login_service(payload);
-      onClose();
+      const response = await login_service(payload);
+      if (response.data.status) {
+        showToast("Login successful!", "success");
+        setTimeout(onClose, 2000);
+      } else {
+        console.log(response)
+        showToast(response.data.message || "Login failed");
+      }
     } catch (error) {
-      console.error("Login failed:", error);
+      showToast(error.response?.data?.message || "Login failed. Please try again.");
     }
   };
 
@@ -94,6 +110,24 @@ const LoginPage = ({ onSwitchToRegister, onClose }) => {
           </form>
         </Box>
       </Container>
+
+      {/* Toast Notification */}
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={6000}
+        onClose={() => setToastOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={() => setToastOpen(false)}
+          severity={toastSeverity}
+          sx={{ width: "100%" }}
+        >
+          {toastMessage}
+        </MuiAlert>
+      </Snackbar>
     </Box>
   );
 };
