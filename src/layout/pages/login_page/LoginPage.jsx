@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TextField, Button, Container, Typography, Box, Link } from "@mui/material";
-import { login_service } from "../../services/authServices/authServices";
+import { login_service } from "../../../services/authServices/authServices";
 
 const LoginPage = ({ onSwitchToRegister, onClose }) => {
   const [email, setEmail] = useState("");

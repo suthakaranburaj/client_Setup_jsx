@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TextField, Button, Container, Typography, Box, Grid, Link } from "@mui/material";
-import { save_user_service } from "../../services/authServices/authServices";
+import { save_user_service } from "../../../services/authServices/authServices";
 
 const RegisterPage = ({ onSwitchToLogin, onClose }) => {
 
