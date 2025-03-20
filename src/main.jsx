@@ -5,6 +5,7 @@ import App from "./App.jsx";
 import * as Pages from "./layout/index.js";
 import * as Routes from "./routes/index.js";
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom"; // Import Navigate
+import NotFoundPage from "./layout/components/NotFoundPage";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
   {
     path: Routes.REGISTER, // Add this route
     element: <Pages.Register />
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />
   }
   // {
   //   path:'/chatbot',
