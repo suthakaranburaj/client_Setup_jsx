@@ -16,6 +16,7 @@ export const logout_service = asyncHandler(async () => {
   const response = await axios.get(`${AUTH}/logout`, {
     withCredentials: true // Enable credentials
   });
+  localStorage.removeItem("user");
   return response;
 });
 
@@ -33,5 +34,8 @@ export const get_current_user_service = asyncHandler(async () => {
   const response = await axios.get(`${AUTH}`, {
     withCredentials: true // Enable credentials
   });
+  console.log("response", response.data.data);
+  localStorage.setItem("user", JSON.stringify(response.data.data));
+
   return response;
 });

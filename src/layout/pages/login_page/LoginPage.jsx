@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextField, Button, Container, Typography, Box, Link, Snackbar } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
-import { login_service } from "../../../services/authServices/authServices";
-
+import {
+  login_service,
+  get_current_user_service
+} from "../../../services/authServices/authServices";
+import { getCookie } from "../../../helper/commonHelper";
 const LoginPage = ({ onSwitchToRegister, onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,9 +29,11 @@ const LoginPage = ({ onSwitchToRegister, onClose }) => {
       const response = await login_service(payload);
       if (response.data.status) {
         showToast("Login successful!", "success");
+        await handle_get_user();
+        window.location.reload();
         setTimeout(onClose, 2000);
       } else {
-        console.log(response)
+        // console.log(response);
         showToast(response.data.message || "Login failed");
       }
     } catch (error) {
@@ -36,6 +41,37 @@ const LoginPage = ({ onSwitchToRegister, onClose }) => {
     }
   };
 
+  useEffect(() => {
+    const checkUser = async () => {
+      await handle_get_user();
+    };
+    checkUser();
+  }, [onClose]);
+
+  const handle_get_user = async () => {
+    const accessToken = getCookie("accessToken");
+    const refreshToken = getCookie("refreshToken");
+    if (!accessToken || !refreshToken) {
+      // setSession(null);
+      localStorage.removeItem("user");
+      return;
+    }
+
+    try {
+      const response = await get_current_user_service();
+      if (response.data.data) {
+        // console.log('heelo')
+        // setSession({
+        //   user: response.data.data
+        // });
+        // localStorage.setItem("user", response.data.data);
+      }
+      // console.log("response", response.data.data);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      // localStorage.removeItem("user");
+    }
+  };
   return (
     <Box
       sx={{

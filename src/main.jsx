@@ -6,6 +6,7 @@ import * as Pages from "./layout/index.js";
 import * as Routes from "./routes/index.js";
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom"; // Import Navigate
 import NotFoundPage from "./layout/components/NotFoundPage";
+import { AuthGuard } from "./layout/components/AuthGuard";
 
 const router = createBrowserRouter([
   {
@@ -14,34 +15,40 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Navigate to={Routes.DASHBOARD} replace /> // Redirect to /dashboard
+        element: <Navigate to={Routes.DASHBOARD} replace />
       },
       {
         path: Routes.DASHBOARD,
-        element: <Pages.Dashboard />
+        element: (
+          // <AuthGuard>
+            <Pages.Dashboard />
+          // </AuthGuard>
+        )
       },
       {
         path: Routes.PROFILE,
-        element: <Pages.ProfilePage />
+        element: (
+          <AuthGuard>
+            <Pages.ProfilePage />
+          </AuthGuard>
+        )
       }
     ]
   },
   {
-    path: Routes.LOGIN, // Add this route
-    element: <Pages.Login />
+    path: Routes.LOGIN,
+    element: (
+        <Pages.Login />
+    )
   },
   {
-    path: Routes.REGISTER, // Add this route
+    path: Routes.REGISTER,
     element: <Pages.Register />
   },
   {
     path: "*",
     element: <NotFoundPage />
   }
-  // {
-  //   path:'/chatbot',
-  //   element:<ChatBot/>
-  // }
 ]);
 
 createRoot(document.getElementById("root")).render(<RouterProvider router={router} />);

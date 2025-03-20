@@ -76,19 +76,19 @@ const NAVIGATION = [
         segment: "bonds",
         title: "Bonds",
         icon: <DescriptionIcon />,
-        path:''
+        path: ""
       },
       {
         segment: "stocks",
         title: "Stocks",
         icon: <DescriptionIcon />,
-        path:''
+        path: ""
       },
       {
         segment: "insurances",
         title: "Insurances",
         icon: <DescriptionIcon />,
-        path:''
+        path: ""
       }
     ]
   },
@@ -96,7 +96,7 @@ const NAVIGATION = [
     segment: "history",
     title: "History",
     icon: <LayersIcon />,
-    path:'',
+    path: ""
   }
 ];
 
@@ -363,6 +363,9 @@ function DashboardLayoutAccountSidebar(props) {
         signOut: async () => {
           await logout_service();
           setSession(null);
+          setTimeout(() => {
+            globalThis.location.reload();
+          }, 100);
         }
       }}
       session={session?.user ? session : null}
